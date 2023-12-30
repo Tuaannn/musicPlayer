@@ -8,10 +8,14 @@ const cd = $(".cd");
 const playBtn = $(".btn-toggle-play");
 const player = $(".player");
 const progress = $("#progress");
+const nextBtn = $(".btn-next");
+const prevBtn = $(".fa-step-backward");
+const randomBtn = $(".btn-random");
 
 const app = {
     currentIndex: 0,
     isPlaying: false,
+    isRandom: false,
 
     songs: [
         {
@@ -97,8 +101,8 @@ const app = {
         const cdThumbAnimate = cdThumb.animate(
             [{ transform: "rotate(360deg)" }],
             {
+                iterations: Infinity,
                 duration: 10000,
-                interations: Infinity,
             }
         );
 
@@ -152,6 +156,37 @@ const app = {
 
             audio.currentTime = seekTime;
         };
+
+        // Khi next bài hát
+        nextBtn.onclick = function () {
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            } else {
+                _this.nextSong();
+            }
+
+            if (_this.isPlaying) {
+                audio.play();
+            }
+        };
+
+        // Khi pre bài hát
+        prevBtn.onclick = function () {
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            } else {
+                _this.prevSong();
+            }
+            if (_this.isPlaying) {
+                audio.play();
+            }
+        };
+
+        // Xử lý bật tắt Random bài hát
+        randomBtn.onclick = function (e) {
+            _this.isRandom = !_this.isRandom;
+            randomBtn.classList.toggle("active", _this.isRandom);
+        };
     },
 
     loadCurrentSong: function () {
@@ -160,10 +195,31 @@ const app = {
         audio.src = this.currentSong.path;
     },
 
-    loadCurrentSong: function () {
-        heading.innerHTML = this.currentSong.name;
-        cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
-        audio.src = this.currentSong.path;
+    nextSong: function () {
+        this.currentIndex++;
+        if (this.currentIndex >= this.songs.length) {
+            this.currentIndex = 0;
+        }
+        this.loadCurrentSong();
+    },
+
+    playRandomSong: function () {
+        let newIndex;
+
+        do {
+            newIndex = Math.floor(Math.random() * this.songs.length);
+        } while (newIndex == this.currentIndex);
+
+        this.currentIndex = newIndex;
+        this.loadCurrentSong();
+    },
+
+    prevSong: function () {
+        this.currentIndex--;
+        if (this.currentIndex < 0) {
+            this.currentIndex = this.songs.length - 1;
+        }
+        this.loadCurrentSong();
     },
 
     start: function () {
@@ -188,18 +244,22 @@ app.start();
 // const $ = document.querySelector.bind(document);
 // const $$ = document.querySelectorAll.bind(document);
 
+// const playList = $(".playlist");
+// const cd = $(".cd");
 // const heading = $("header h2");
 // const cdThumb = $(".cd-thumb");
 // const audio = $("#audio");
-// const cd = $(".cd");
 // const playBtn = $(".btn-toggle-play");
 // const player = $(".player");
-// const progress = $("#progress");
+// const progress = $(".progress");
+// const nextBtn = $(".fa-step-forward");
+// const prevBtn = $(".fa-step-backward");
+// const ranomBtn = $(".btn-random");
 
 // const app = {
-//     currentIndex: 0,
+//     currentIndex: 1,
 //     isPlaying: false,
-
+//     isRandom: false,
 //     songs: [
 //         {
 //             name: "Thuyền Quyên",
@@ -246,15 +306,11 @@ app.start();
 //     ],
 
 //     render: function () {
-//         const htmls = this.songs.map((song) => {
+//         let htmls = this.songs.map((song) => {
 //             return `
 //             <div class="song">
-//                 <div
-//                     class="thumb"
-//                     style="
-//                         background-image: url('${song.image}');">
+//                 <div class="thumb" style="background-image: url('${song.image}')">
 //                 </div>
-
 //                 <div class="body">
 //                     <h3 class="title">${song.name}</h3>
 //                     <p class="author">${song.singer}</p>
@@ -262,73 +318,11 @@ app.start();
 //                 <div class="option">
 //                     <i class="fas fa-ellipsis-h"></i>
 //                 </div>
-//             </div>`;
+//              </div>
+//             `;
 //         });
 
-//         $(".playlist").innerHTML = htmls.join("");
-//     },
-
-//     handleEventDoms: function () {
-//         const cdWidth = cd.offsetWidth;
-//         const _this = this;
-
-//         document.onscroll = function () {
-//             const scrollTop =
-//                 window.scrollY || document.documentElement.scrollTop;
-
-//             const newCdWidth = cdWidth - scrollTop;
-
-//             cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
-
-//             cd.style.opacity = newCdWidth / cdWidth;
-//         };
-
-//         playBtn.onclick = function () {
-//             if (_this.isPlaying) {
-//                 audio.pause();
-//             } else {
-//                 audio.play();
-//             }
-//         };
-
-//         const cdRotate = cd.animate([{ transform: "rotate(360deg)" }], {
-//             interations: Infinity,
-//             duration: 10000,
-//         });
-
-//         cdRotate.pause();
-
-//         audio.ontimeupdate = function () {
-//             if (audio.duration) {
-//                 const progressPercent =
-//                     (Math.floor(audio.currentTime) / audio.duration) * 100;
-
-//                 progress.value = progressPercent;
-//             }
-//         };
-
-//         progress.oninput = function (e) {
-//             const seekTime = (e.target.value * audio.duration) / 100;
-//             audio.currentTime = seekTime;
-//         };
-
-//         audio.onplay = function () {
-//             _this.isPlaying = true;
-//             player.classList.add("playing");
-//             cdRotate.play();
-//         };
-
-//         audio.onpause = function () {
-//             _this.isPlaying = false;
-//             player.classList.remove("playing");
-//             cdRotate.pause();
-//         };
-//     },
-
-//     loadCurrentSong: function () {
-//         heading.textContent = this.currentSong.name;
-//         cdThumb.style.backgroundImage = `url("${this.currentSong.image}")`;
-//         audio.src = this.currentSong.path;
+//         playList.innerHTML = htmls.join("");
 //     },
 
 //     defineProperties: function () {
@@ -339,14 +333,127 @@ app.start();
 //         });
 //     },
 
+//     handleEventsDom: function () {
+//         const cdWidth = cd.offsetWidth;
+//         const _this = this;
+
+//         document.onscroll = function () {
+//             const scrollTop =
+//                 window.scrollY || document.documentElement.scrollTop;
+
+//             newCdWidth = cdWidth - scrollTop;
+
+//             cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
+//             cd.style.opacity = newCdWidth / cdWidth;
+//         };
+
+//         const cdAnimate = cd.animate([{ transform: "rotate(360deg" }], {
+//             duration: 10000,
+//             iterations: Infinity,
+//         });
+
+//         cdAnimate.pause();
+
+//         playBtn.onclick = function () {
+//             if (_this.isPlaying) {
+//                 audio.pause();
+//             } else {
+//                 audio.play();
+//             }
+//         };
+
+//         audio.onplay = function () {
+//             _this.isPlaying = true;
+//             cdAnimate.play();
+//             player.classList.add("playing");
+//         };
+
+//         audio.onpause = function () {
+//             _this.isPlaying = false;
+//             cdAnimate.pause();
+//             player.classList.remove("playing");
+//         };
+
+//         audio.ontimeupdate = function () {
+//             if (audio.duration) {
+//                 progressPercent = Math.floor(
+//                     (audio.currentTime / audio.duration) * 100
+//                 );
+
+//                 progress.value = progressPercent;
+//             }
+//         };
+
+//         progress.oninput = function () {
+//             const seekTime = (progress.value * audio.duration) / 100;
+//             audio.currentTime = seekTime;
+//         };
+
+//         nextBtn.onclick = function () {
+//             if (_this.isRandom) {
+//                 _this.playRandomSong();
+//             } else {
+//                 _this.nextSong();
+//             }
+//             if (_this.isPlaying) {
+//                 audio.play();
+//             }
+//         };
+
+//         prevBtn.onclick = function () {
+//             if (_this.isRandom) {
+//                 _this.playRandomSong();
+//             } else {
+//                 _this.prevSong();
+//             }
+//             if (_this.isPlaying) {
+//                 audio.play();
+//             }
+//         };
+
+//         ranomBtn.onclick = function () {
+//             _this.isRandom = !_this.isRandom;
+//             ranomBtn.classList.toggle("active", _this.isRandom);
+//         };
+//     },
+
+//     loadCurrentSong: function () {
+//         heading.textContent = this.currentSong.name;
+//         cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
+//         audio.src = this.currentSong.path;
+//     },
+
+//     nextSong: function () {
+//         this.currentIndex++;
+//         if (this.currentIndex >= this.songs.length) {
+//             this.currentIndex = 0;
+//         }
+//         this.loadCurrentSong();
+//     },
+
+//     prevSong: function () {
+//         this.currentIndex--;
+//         if (this.currentIndex < 0) {
+//             this.currentIndex = this.songs.length - 1;
+//         }
+//         this.loadCurrentSong();
+//     },
+
+//     playRandomSong: function () {
+//         let newCurrentIndext;
+//         do {
+//             newCurrentIndext = Math.floor(Math.random() * this.songs.length);
+//         } while (newCurrentIndext == this.currentIndex);
+
+//         this.currentIndex = newCurrentIndext;
+//         this.loadCurrentSong();
+//     },
+
 //     start: function () {
 //         this.defineProperties();
-
 //         this.loadCurrentSong();
-
 //         this.render();
-
-//         this.handleEventDoms();
+//         this.handleEventsDom();
 //     },
 // };
 
