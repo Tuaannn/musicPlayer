@@ -123,7 +123,7 @@ header h2 {
 .progress::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 12px;
+    width: var(--thumb-width, 0);
     height: 6px;
     background-color: var(--primary-color);
     cursor: pointer;
@@ -186,4 +186,8 @@ header h2 {
     padding: 16px 8px;
     color: #999;
     font-size: 18px;
+}
+
+.song.active {
+    background-color: var(--primary-color);
 }
