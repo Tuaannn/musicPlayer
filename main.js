@@ -239,7 +239,7 @@ const app = {
 
             if (songNode || e.target.closest(".option")) {
                 // xử lý khi click vào bài hát
-                console.log(e.target);
+
                 if (songNode) {
                     _this.currentIndex = Number(songNode.dataset.index);
                     _this.loadCurrentSong();
