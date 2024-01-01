@@ -330,6 +330,7 @@
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+const PLAYER_STORAGE_KEY = "Tuaan";
 
 const playList = $(".playlist");
 const cd = $(".cd");
@@ -394,6 +395,13 @@ const app = {
             image: "./assets/images/Hoa điêu thuyền.jpg",
         },
     ],
+
+    setConfig: function (key, value) {
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
+    },
+
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
 
     render: function () {
         let htmls = this.songs.map((song, index) => {
@@ -502,11 +510,15 @@ const app = {
         randomBtn.onclick = function () {
             _this.isRandom = !_this.isRandom;
             randomBtn.classList.toggle("active", _this.isRandom);
+
+            _this.setConfig("isRandom", _this.isRandom);
         };
 
         repeatBtn.onclick = function () {
             _this.isRepeat = !_this.isRepeat;
             repeatBtn.classList.toggle("active", _this.repeatBtn);
+
+            _this.setConfig("isRepeat", _this.isRepeat);
         };
 
         audio.onended = function () {
@@ -563,6 +575,11 @@ const app = {
         this.loadCurrentSong();
     },
 
+    loadConfig: function () {
+        this.isRandom = this.config.isRandom;
+        this.isRepeat = this.config.isRepeat;
+    },
+
     loadCurrentSong: function () {
         heading.textContent = this.currentSong.name;
         cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
@@ -586,10 +603,14 @@ const app = {
     },
 
     start: function () {
+        this.loadConfig();
         this.defineProperties();
         this.render();
         this.handleEventsDom();
         this.loadCurrentSong();
+
+        randomBtn.classList.toggle("active", this.isRandom);
+        repeatBtn.classList.toggle("active", this.isRepeat);
     },
 };
 
