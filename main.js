@@ -346,7 +346,7 @@ const repeatBtn = $(".btn-repeat");
 const songs = $$(".song");
 
 const app = {
-    currentIndex: 1,
+    currentIndex: 0,
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
